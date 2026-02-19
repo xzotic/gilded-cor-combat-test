@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7a66fa248c720da4db3731ba80cda6ea, type: 3}
+  m_Name: skill_test0_1
+  m_EditorClassIdentifier: Assembly-CSharp::Skill_000
+  skillName: Test Damage Skill 1
+  icon: {fileID: 0}
+  target: 2
+  sorceryType: 2
+  minRoll: 0
+  maxRoll: 20
+  basePower: 120
+  atkWeight: 1
+  cooldown: 0

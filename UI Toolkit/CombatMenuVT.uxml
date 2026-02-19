@@ -1,0 +1,6 @@
+<ui:UXML xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI%20Toolkit/CombatMenu.uss?fileID=7433441132597879392&amp;guid=d5540fe5890aaaf4fb6f34f888bdb4e2&amp;type=3#CombatMenu"/>
+    <ui:VisualElement name="Holder" style="flex-grow: 1;">
+        <ui:Image name="Image" enabled="true" style="background-image: url(&quot;project://database/Assets/Sprites/ovine_portrait.jpg?fileID=21300000&amp;guid=140267312245f5942a433bf4f76b3c94&amp;type=3#ovine_portrait&quot;); height: 400px; width: 300px; aspect-ratio: auto; position: relative; top: 457px;"/>
+    </ui:VisualElement>
+</ui:UXML>

@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4024883616bed344795be24c65632e8d, type: 3}
+  m_Name: Sinner
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterData
+  characterId: 00
+  displayName: The Sinner
+  baseHP: 100
+  baseMentalRes: 10
+  basePhysAttack: 100
+  baseSpeAttack: 100
+  basePhysDefense: 100
+  baseSpeDefense: 100
+  hpGrowthRate: 0.022
+  physAttackGrowthRate: 0.022
+  speAttackGrowthRate: 0.022
+  physDefenseGrowthRate: 0.025
+  speDefenseGrowthRate: 0.025
