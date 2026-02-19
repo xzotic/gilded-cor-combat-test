@@ -9,6 +9,6 @@ public class SkillHolder : MonoBehaviour
 
     public void EnterToActionQueue()
     {
-        battleManager.EnterToActionQueue(skillIndex, actionType);
+        battleManager.SelectAndEnterAction(skillIndex, actionType);
     }
 }

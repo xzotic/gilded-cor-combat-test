@@ -28,8 +28,10 @@ public class BattleManager : MonoBehaviour
     public GameObject enemyHolder;
     public Enemy enemy;
     public EnemyPart EnemyPart;
+    public EnemySelector enemySelector;
     public EnemyPartCycle partSelector;
 
+    public bool enemySelectStopFlag = false;
     public bool partSelectStopFlag = false;
     private bool currentlySelecting;
 
@@ -79,6 +81,11 @@ public class BattleManager : MonoBehaviour
 
     public void EnterToActionQueue(int index, ActionType actionType)    // todo: remove ActionType actionType
     {
+        EnterToActionQueue(index, actionType, null, null);
+    }
+
+    public void EnterToActionQueue(int index, ActionType actionType, Enemy selectedEnemy, EnemyPart selectedPart)
+    {
         TurnAction turnAction = new TurnAction();
         turnAction.characterIndex = turnManager.currentPlayerIndex; //0,1,2,3
         turnAction.characterID = turnManager.characterIndex;
@@ -104,7 +111,8 @@ public class BattleManager : MonoBehaviour
                     turnAction.targetType = Skill.TargetType.Enemy;
 
                     turnAction.target_ally = partyManager.GetBattleCharacter(turnAction.characterID);
-                    turnAction.target_enemy = GameObject.FindWithTag("Enemy Holder").GetComponentInChildren<Enemy>();
+                    turnAction.target_enemy = selectedEnemy;
+                    turnAction.target_part = selectedPart;
 
 
                     break;
@@ -144,8 +152,78 @@ public class BattleManager : MonoBehaviour
         EnterToActionQueue(-1, ActionType.EndTurn);
     }
 
+    public void SelectAndEnterAction(int index, ActionType actionType)
+    {
+        StartCoroutine(SelectAndEnterActionRoutine(index, actionType));
+    }
 
-    private IEnumerator SelectTargetEnum()
+    private IEnumerator SelectAndEnterActionRoutine(int index, ActionType actionType)
+    {
+        if (index == -1 || actionType != ActionType.SorcerySkill)
+        {
+            EnterToActionQueue(index, actionType);
+            yield break;
+        }
+
+        BattleCharacter bc = partyManager.GetBattleCharacter(turnManager.characterIndex);
+        Skill selectedSkill = bc.skills[index];
+
+        if (selectedSkill.target != Skill.TargetType.Enemy)
+        {
+            EnterToActionQueue(index, actionType);
+            yield break;
+        }
+
+        Enemy selectedEnemy = null;
+        EnemyPart selectedPart = null;
+
+        Enemy[] activeEnemies = GetActiveEnemies();
+        if (activeEnemies.Length == 0)
+        {
+            Debug.LogWarning("No enemy found for enemy-targeted skill.");
+            yield break;
+        }
+
+        if (activeEnemies.Length == 1)
+        {
+            selectedEnemy = activeEnemies[0];
+        }
+        else
+        {
+            yield return StartCoroutine(SelectEnemyEnum(activeEnemies));
+            selectedEnemy = enemySelector != null ? enemySelector.selectedEnemy : null;
+
+            if (selectedEnemy == null)
+            {
+                yield break;
+            }
+        }
+
+        yield return StartCoroutine(SelectTargetEnum(selectedEnemy));
+        if (selectedEnemy.currentSelectedPart != null)
+        {
+            selectedPart = selectedEnemy.currentSelectedPart.GetComponent<EnemyPart>();
+        }
+
+        if (selectedPart == null)
+        {
+            yield break;
+        }
+
+        EnterToActionQueue(index, actionType, selectedEnemy, selectedPart);
+    }
+
+    private Enemy[] GetActiveEnemies()
+    {
+        if (enemyHolder == null)
+        {
+            return new Enemy[0];
+        }
+
+        return enemyHolder.GetComponentsInChildren<Enemy>();
+    }
+
+    private IEnumerator SelectEnemyEnum(Enemy[] activeEnemies)
     {
         currentlySelecting = true;
 
@@ -153,8 +231,51 @@ public class BattleManager : MonoBehaviour
         menuNav.DisplayMainLayer();
         menuNav.DisableMainLayer();
 
+        enemySelectStopFlag = false;
+
+        if (enemySelector == null)
+        {
+            enemySelector = enemyHolder.GetComponentInChildren<EnemySelector>(true);
+        }
+
+        if (enemySelector == null)
+        {
+            Debug.LogWarning("EnemySelector is not assigned.");
+            currentlySelecting = false;
+            yield break;
+        }
+
+        enemySelector.gameObject.SetActive(true);
+        enemySelector.StartSelection(activeEnemies, this);
+
+        yield return new WaitUntil(() => enemySelectStopFlag == true);
+
+        currentlySelecting = false;
+    }
+
+
+    private IEnumerator SelectTargetEnum(Enemy selectedEnemy)
+    {
+        currentlySelecting = true;
+
+        menuNav.DisplayDice(false);
+        menuNav.DisplayMainLayer();
+        menuNav.DisableMainLayer();
+
+        if (partSelector == null)
+        {
+            partSelector = enemyHolder.GetComponentInChildren<EnemyPartCycle>(true);
+        }
+
+        if (partSelector == null)
+        {
+            Debug.LogWarning("EnemyPartCycle is not assigned.");
+            currentlySelecting = false;
+            yield break;
+        }
+
         partSelector.gameObject.SetActive(true);
-        partSelector.StartSelection();
+        partSelector.StartSelection(selectedEnemy);
 
         yield return new WaitUntil(() => partSelectStopFlag == true);
 

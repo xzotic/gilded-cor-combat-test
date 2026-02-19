@@ -5,9 +5,10 @@ public class EnemyPartCycle : MonoBehaviour
 {
     private PlayerInput playerInput;
     private InputActionMap actionMap;
-    private InputAction action;
-    private InputAction action_press;
-    private InputAction action_release;
+    private InputAction navigateAction;
+    private InputAction submitAction;
+    private InputAction cancelAction;
+
     [SerializeField] private Enemy enemy;
     [SerializeField] private BattleManager battleManager;
 
@@ -17,52 +18,71 @@ public class EnemyPartCycle : MonoBehaviour
     {
         playerInput = GetComponent<PlayerInput>();
         actionMap = playerInput.actions.FindActionMap("Combat Menu");
-        action = actionMap.FindAction("Navigation");
-        action_press = actionMap.FindAction("Submit");
+        navigateAction = actionMap.FindAction("Navigation");
+        submitAction = actionMap.FindAction("Submit");
+        cancelAction = actionMap.FindAction("Cancel");
     }
 
     private void OnDisable()
     {
-        action.performed -= OnNavigate;
-        action_press.performed -= StopSelection;
-        action_release.performed -= CancelSelection;
+        UnbindActions();
     }
 
-    public void StartSelection()
+    public void StartSelection(Enemy selectedEnemy)
     {
-        enemy = transform.parent.GetComponentInChildren<Enemy>();
-        battleManager.partSelectStopFlag = false;
-        action.performed += OnNavigate;
+        enemy = selectedEnemy;
 
-        action_press.performed += StopSelection;
-        action_release.performed += CancelSelection;
+        if (enemy == null)
+        {
+            battleManager.partSelectStopFlag = true;
+            return;
+        }
+
+        if (enemy.transform.childCount > 0)
+        {
+            currentSelection = enemy.transform.GetChild(0).gameObject;
+            transform.position = currentSelection.transform.position;
+        }
+
+        battleManager.partSelectStopFlag = false;
+
+        navigateAction.performed += OnNavigate;
+        submitAction.performed += StopSelection;
+        cancelAction.performed += CancelSelection;
     }
 
     public void StopSelection(InputAction.CallbackContext ctx)
     {
-        enemy = null;
-        action.performed -= OnNavigate;
-        action_press.performed -= StopSelection;
-        action_release.performed -= CancelSelection;
-
         enemy.currentSelectedPart = currentSelection;
-        battleManager.partSelectStopFlag = true;
+        FinishSelection();
     }
 
     public void CancelSelection(InputAction.CallbackContext ctx)
     {
-        enemy = null;
-        action.performed -= OnNavigate;
-        action_press.performed -= StopSelection;
-        action_release.performed -= CancelSelection;
-
         enemy.currentSelectedPart = null;
+        FinishSelection();
+    }
+
+    private void FinishSelection()
+    {
+        UnbindActions();
         battleManager.partSelectStopFlag = true;
     }
 
+    private void UnbindActions()
+    {
+        if (navigateAction != null) navigateAction.performed -= OnNavigate;
+        if (submitAction != null) submitAction.performed -= StopSelection;
+        if (cancelAction != null) cancelAction.performed -= CancelSelection;
+    }
 
     public void MoveSelection(Vector2 inputDir)
     {
+        if (enemy == null || currentSelection == null)
+        {
+            return;
+        }
+
         Transform bestCandidate = null;
         Transform fallbackCandidate = null;
 
@@ -81,7 +101,6 @@ public class EnemyPartCycle : MonoBehaviour
 
             float distance = toCandidate.magnitude;
 
-            // ✅ Normal directional selection
             if (dot > 0.5f)
             {
                 if (distance < bestScore)
@@ -90,7 +109,6 @@ public class EnemyPartCycle : MonoBehaviour
                     bestCandidate = candidate;
                 }
             }
-            // ✅ Opposite direction fallback (wrap-around)
             else if (dot < -0.5f)
             {
                 if (distance > furthestOpposite)
