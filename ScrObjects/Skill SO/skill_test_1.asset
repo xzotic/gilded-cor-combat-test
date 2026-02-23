@@ -14,8 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Skill_001
   skillName: Test Heal Skill 1
   icon: {fileID: 0}
-  target: 0
-  sorceryType: 2
+  target: 1
+  skillCategory: 2
+  skillType: 1
+  meleeType: 0
+  sorceryType: 3
   minRoll: 0
   maxRoll: 20
   basePower: 0

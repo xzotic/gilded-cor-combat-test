@@ -6,7 +6,6 @@ public abstract class Enemy : MonoBehaviour
     public int id;
     public int maxHP;
     public int currentHP;
-    public GameObject currentSelectedPart;
     public bool isBoss;
 
     [Header("Sorcery Resistances")]
@@ -24,9 +23,9 @@ public abstract class Enemy : MonoBehaviour
 
     [Header("Physical Resistances")]
     public float physRes;
-    public float cutRes;
-    public float pierceRes;
-    public float bluntRes;
+    public float severRes;
+    public float impactRes;
+    public float punctureRes;
 
     private void Start()
     {

@@ -1,14 +1,16 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 public class SkillHolder : MonoBehaviour
 {
     public int skillIndex;
+    public Skill heldSkill;
     public ActionType actionType;
-    [SerializeField] private TurnManager turnManager;
+    [SerializeField] EnemySelectorGeneral general;
     [SerializeField] private BattleManager battleManager;
 
-    public void EnterToActionQueue()
+    public void SendActionSignal()
     {
-        battleManager.EnterToActionQueue(skillIndex, actionType);
+        battleManager.SortSkillCategory(heldSkill, skillIndex, actionType);
     }
 }

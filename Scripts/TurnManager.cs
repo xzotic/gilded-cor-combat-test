@@ -51,6 +51,7 @@ public class TurnManager : MonoBehaviour
 
     void StartTurn()
     {
+        menuNav.DisplayMainLayer();
         characterIndex = partyManager.activeMembers[currentPlayerIndex];
         partyManager.EnableCharacterTurn(characterIndex);
         partyManager.UpdateHPSP(characterIndex);

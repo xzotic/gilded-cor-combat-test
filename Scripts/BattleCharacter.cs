@@ -31,10 +31,22 @@ public class BattleCharacter : MonoBehaviour
     public Skill[] skills = new Skill[6];
 
     [Header("Special Resistances")]
-    public float specialRes, flameRes, lightRes, darkRes, fateRes, plagueRes, galeRes, natureRes, deathRes, starRes;
+    public float specialRes;
+    public float flameRes;
+    public float lightRes;
+    public float darkRes;
+    public float fateRes;
+    public float plagueRes;
+    public float galeRes;
+    public float natureRes;
+    public float deathRes;
+    public float starRes;
 
     [Header("Physical Resistances")]
-    public float cutRes, bluntRes, pierceRes, physRes;
+    public float severRes;
+    public float impactRes;
+    public float punctureRes;
+    public float physRes;
 
     private void Awake()
     {

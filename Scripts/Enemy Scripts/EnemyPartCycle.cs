@@ -8,8 +8,9 @@ public class EnemyPartCycle : MonoBehaviour
     private InputAction action;
     private InputAction action_press;
     private InputAction action_release;
-    [SerializeField] private Enemy enemy;
-    [SerializeField] private BattleManager battleManager;
+    private Enemy enemy;
+    [SerializeField] private EnemySelector enemySelector;
+    [SerializeField] private EnemySelectorGeneral general;
 
     public GameObject currentSelection;
 
@@ -19,45 +20,47 @@ public class EnemyPartCycle : MonoBehaviour
         actionMap = playerInput.actions.FindActionMap("Combat Menu");
         action = actionMap.FindAction("Navigation");
         action_press = actionMap.FindAction("Submit");
+        action_release = actionMap.FindAction("Cancel");
     }
 
     private void OnDisable()
     {
         action.performed -= OnNavigate;
-        action_press.performed -= StopSelection;
-        action_release.performed -= CancelSelection;
+        action_press.performed -= FinishPartSelection;
+        action_release.performed -= CancelPartSelection;
     }
 
-    public void StartSelection()
+    public void StartPartSelection(Enemy enemySelect)
     {
-        enemy = transform.parent.GetComponentInChildren<Enemy>();
-        battleManager.partSelectStopFlag = false;
+        enemy = enemySelect;
+        currentSelection = enemy.transform.GetChild(0).gameObject;
+        transform.position = currentSelection.transform.position;
+
         action.performed += OnNavigate;
 
-        action_press.performed += StopSelection;
-        action_release.performed += CancelSelection;
+        action_press.performed += FinishPartSelection;
+        action_release.performed += CancelPartSelection;
     }
 
-    public void StopSelection(InputAction.CallbackContext ctx)
+    public void FinishPartSelection(InputAction.CallbackContext ctx)
     {
         enemy = null;
-        action.performed -= OnNavigate;
-        action_press.performed -= StopSelection;
-        action_release.performed -= CancelSelection;
+        general.selectedEnemyPart = currentSelection.GetComponent<EnemyPart>();
+        general.EnterToActionQueue();
 
-        enemy.currentSelectedPart = currentSelection;
-        battleManager.partSelectStopFlag = true;
+        action.performed -= OnNavigate;
+        action_press.performed -= FinishPartSelection;
+        action_release.performed -= CancelPartSelection;
     }
 
-    public void CancelSelection(InputAction.CallbackContext ctx)
+    public void CancelPartSelection(InputAction.CallbackContext ctx)
     {
         enemy = null;
-        action.performed -= OnNavigate;
-        action_press.performed -= StopSelection;
-        action_release.performed -= CancelSelection;
+        enemySelector.StartEnemySelection();
 
-        enemy.currentSelectedPart = null;
-        battleManager.partSelectStopFlag = true;
+        action.performed -= OnNavigate;
+        action_press.performed -= FinishPartSelection;
+        action_release.performed -= CancelPartSelection;
     }
 
 

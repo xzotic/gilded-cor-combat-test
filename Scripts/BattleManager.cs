@@ -8,6 +8,8 @@ public class BattleManager : MonoBehaviour
 {
     public PartyManager partyManager;
     public TurnManager turnManager;
+    public EnemySelector enemySelector;
+    public EnemySelectorGeneral general;
     public GameObject playables;
     public CombatMenuNav menuNav;
     [SerializeField] private GlobalData globalData;
@@ -23,15 +25,6 @@ public class BattleManager : MonoBehaviour
     public int currentRoll;
     public GameObject diceHolder;
     public bool diceStopFlag = false;
-
-    [Header("Enemy")]
-    public GameObject enemyHolder;
-    public Enemy enemy;
-    public EnemyPart EnemyPart;
-    public EnemyPartCycle partSelector;
-
-    public bool partSelectStopFlag = false;
-    private bool currentlySelecting;
 
     private void OnEnable()
     {
@@ -52,7 +45,7 @@ public class BattleManager : MonoBehaviour
                 if (action.actionType == ActionType.SorcerySkill) yield return StartCoroutine(RollAuto(action.skill.minRoll, action.skill.maxRoll));
                 break;
             case 2: // Take 10
-                if (action.actionType == ActionType.SorcerySkill) yield return StartCoroutine(Roll10(action.skill.minRoll,action.skill.maxRoll));
+                if (action.actionType == ActionType.SorcerySkill) yield return StartCoroutine(Roll10(action.skill.minRoll, action.skill.maxRoll));
                 break;
         }
 
@@ -77,7 +70,7 @@ public class BattleManager : MonoBehaviour
         yield return new WaitForSeconds(1f);
     }
 
-    public void EnterToActionQueue(int index, ActionType actionType)    // todo: remove ActionType actionType
+    public void EnterToActionQueue(int index, ActionType actionType, EnemyPart targetPart)    // todo: remove ActionType actionType
     {
         TurnAction turnAction = new TurnAction();
         turnAction.characterIndex = turnManager.currentPlayerIndex; //0,1,2,3
@@ -104,8 +97,11 @@ public class BattleManager : MonoBehaviour
                     turnAction.targetType = Skill.TargetType.Enemy;
 
                     turnAction.target_ally = partyManager.GetBattleCharacter(turnAction.characterID);
-                    turnAction.target_enemy = GameObject.FindWithTag("Enemy Holder").GetComponentInChildren<Enemy>();
 
+                    if (targetPart != null) turnAction.target_enemy = targetPart.GetComponentInParent<Enemy>();
+                    else turnAction.target_enemy = null;
+                    
+                    turnAction.target_part = targetPart;
 
                     break;
                 case Skill.TargetType.AllAllies:
@@ -123,7 +119,8 @@ public class BattleManager : MonoBehaviour
             turnActions.Add(turnAction);
             return;
 
-        } else // not sorcery skill
+        }
+        else // not sorcery skill
         {
             if (actionType == ActionType.EndTurn)
             {
@@ -141,26 +138,29 @@ public class BattleManager : MonoBehaviour
 
     public void EnterEndTurnActionToQueue()
     {
-        EnterToActionQueue(-1, ActionType.EndTurn);
+        EnterToActionQueue(-1, ActionType.EndTurn, null);
     }
 
-
-    private IEnumerator SelectTargetEnum()
+    public void SortSkillCategory(Skill skill, int index, ActionType actionType)
     {
-        currentlySelecting = true;
-
-        menuNav.DisplayDice(false);
-        menuNav.DisplayMainLayer();
-        menuNav.DisableMainLayer();
-
-        partSelector.gameObject.SetActive(true);
-        partSelector.StartSelection();
-
-        yield return new WaitUntil(() => partSelectStopFlag == true);
-
-        currentlySelecting = false;
+        Debug.Log(skill.skillCategory);
+        Debug.Log(skill);
+        switch (skill.skillCategory)
+        {
+            case Skill.SkillCategory.None: break;
+            case Skill.SkillCategory.Recovery: 
+                EnterToActionQueue(index, actionType, null);
+                turnManager.FinishTurn();
+                break;
+            case Skill.SkillCategory.Offense:
+                Debug.Log("b");
+                general.skillIndex = index;
+                general.actionType = actionType;
+                enemySelector.StartEnemySelection();
+                break;
+            case Skill.SkillCategory.Buff: break;
+        }
     }
-
 
     public IEnumerator RollManual(int minRoll, int maxRoll)
     {

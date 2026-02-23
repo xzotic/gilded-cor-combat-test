@@ -13,7 +13,11 @@ public abstract class Skill : ScriptableObject
 
     [Header("Attributes")]
     public TargetType target;
+    public SkillCategory skillCategory;
+    public SkillType skillType;
+    public MeleeType meleeType;
     public SorceryType sorceryType;
+
 
     public int minRoll;
     public int maxRoll;
@@ -24,6 +28,7 @@ public abstract class Skill : ScriptableObject
 
     public enum TargetType
     {
+        None,
         Self,
         Ally,
         Enemy,
@@ -31,8 +36,24 @@ public abstract class Skill : ScriptableObject
         AllEnemies
     }
 
+    public enum SkillCategory
+    {
+        None, Offense, Recovery, Buff
+    }
+
+    public enum SkillType
+    {
+        None, Sorcery, Melee, Defend
+    }
+
+    public enum MeleeType
+    {
+        None, Sever, Impact, Puncture
+    }
+
     public enum SorceryType
     {
+        None, 
         [InspectorName("Intra's Flame")] Flame,
         Flesh,
         Light,
@@ -45,6 +66,7 @@ public abstract class Skill : ScriptableObject
         Star
     }
 
+
     public abstract void Use(int user, Enemy targetEnemy, BattleCharacter targetAlly, int roll);
 
     public virtual float CalculateRawDMG(BattleCharacter bc, Enemy enemy, float rollMult)
@@ -56,26 +78,35 @@ public abstract class Skill : ScriptableObject
         return dmg;
     }
 
-    public virtual int GetBaseRoll()
-    {
-        int roll = Random.Range(minRoll, maxRoll);
-        return roll;
-    }
-
     private float ReturnEnemyRes(Enemy enemy)
     {
-        switch (sorceryType) {
-            case SorceryType.Flame: return enemy.flameRes;
-            case SorceryType.Light: return enemy.lightRes;
-            case SorceryType.Fate: return enemy.fateRes;
-            case SorceryType.Plague: return enemy.plagueRes;
-            case SorceryType.Gale: return enemy.galeRes;
-            case SorceryType.Nature: return enemy.natureRes;
-            case SorceryType.Death: return enemy.deathRes;
-            case SorceryType.Flesh: return enemy.fleshRes;
-            case SorceryType.Star: return enemy.starRes;
-            case SorceryType.Dark: return enemy.darkRes;
-            default: return 1f;
+        if (skillType == SkillType.Sorcery)
+        {
+            switch (sorceryType)
+            {
+                case SorceryType.Flame: return enemy.flameRes;
+                case SorceryType.Light: return enemy.lightRes;
+                case SorceryType.Fate: return enemy.fateRes;
+                case SorceryType.Plague: return enemy.plagueRes;
+                case SorceryType.Gale: return enemy.galeRes;
+                case SorceryType.Nature: return enemy.natureRes;
+                case SorceryType.Death: return enemy.deathRes;
+                case SorceryType.Flesh: return enemy.fleshRes;
+                case SorceryType.Star: return enemy.starRes;
+                case SorceryType.Dark: return enemy.darkRes;
+                default: return 1f;
+            }
         }
+        else if (skillType == SkillType.Melee)
+        {
+            switch (meleeType)
+            {
+                case MeleeType.Sever: return enemy.severRes;
+                case MeleeType.Impact: return enemy.impactRes;
+                case MeleeType.Puncture: return enemy.punctureRes;
+                default: return 1f;
+            }
+        }
+        else return 1f;
     }
 }

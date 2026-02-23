@@ -14,7 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Skill_000
   skillName: Test Damage Skill 0
   icon: {fileID: 0}
-  target: 2
+  target: 3
+  skillCategory: 1
+  skillType: 1
+  meleeType: 0
   sorceryType: 7
   minRoll: 0
   maxRoll: 20

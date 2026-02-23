@@ -99,11 +99,13 @@ public class CombatMenuNav : MonoBehaviour
                 tmp.GetComponentInChildren<TextMeshProUGUI>().text = turnManager.ReturnActiveSkill(i).skillName;
                 tmp.gameObject.GetComponent<SkillHolder>().skillIndex = i;
                 tmp.gameObject.GetComponent<SkillHolder>().actionType = ActionType.SorcerySkill;
+                tmp.gameObject.GetComponent<SkillHolder>().heldSkill = turnManager.ReturnActiveSkill(i);
             }
             else
             {
                 tmp.GetComponentInChildren<TextMeshProUGUI>().text = " ";
                 tmp.gameObject.GetComponent<SkillHolder>().skillIndex = -1;
+                tmp.gameObject.GetComponent<SkillHolder>().heldSkill = null;
                 tmp.interactable = false;
             }
         }
