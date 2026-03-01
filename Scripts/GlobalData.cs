@@ -10,6 +10,12 @@ public class GlobalData : MonoBehaviour
     public DiceRollSetting rollSetting;
     public bool isPaused = false;
     [SerializeField] private GameObject pauseCatch;
+    [SerializeField] private int targetFPS;
+
+    private void Start()
+    {
+        SetTargetFPS(targetFPS);
+    }
 
     public enum DiceRollSetting
     {
@@ -33,5 +39,10 @@ public class GlobalData : MonoBehaviour
             pauseCatch.SetActive(true);
             Time.timeScale = 0;
         }
+    }
+
+    public void SetTargetFPS(int target)
+    {
+        Application.targetFrameRate = target;
     }
 }

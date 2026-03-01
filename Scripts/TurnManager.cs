@@ -86,6 +86,8 @@ public class TurnManager : MonoBehaviour
     private IEnumerator RegisterPlayerActions()
     {
         Debug.Log("<color=yellow>Registering player actions</color>");
+        menuNav.DisplayMainLayer();
+        menuNav.DisableMainLayer();
         state = BattleState.Busy;
 
         partyManager.AnimateResetToOriginalOrder();

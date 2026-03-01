@@ -8,8 +8,7 @@ public class BattleManager : MonoBehaviour
 {
     public PartyManager partyManager;
     public TurnManager turnManager;
-    public EnemySelector enemySelector;
-    public EnemySelectorGeneral general;
+    public SelectorEnemy enemySelector;
     public GameObject playables;
     public CombatMenuNav menuNav;
     [SerializeField] private GlobalData globalData;
@@ -23,6 +22,7 @@ public class BattleManager : MonoBehaviour
     //public int twodice_2;
     public int onedice;
     public int currentRoll;
+    public int[] rollQueue = new int[3];
     public GameObject diceHolder;
     public bool diceStopFlag = false;
 
@@ -143,8 +143,8 @@ public class BattleManager : MonoBehaviour
 
     public void SortSkillCategory(Skill skill, int index, ActionType actionType)
     {
-        Debug.Log(skill.skillCategory);
-        Debug.Log(skill);
+        //Debug.Log(skill.skillCategory);
+        //Debug.Log(skill);
         switch (skill.skillCategory)
         {
             case Skill.SkillCategory.None: break;
@@ -153,14 +153,46 @@ public class BattleManager : MonoBehaviour
                 turnManager.FinishTurn();
                 break;
             case Skill.SkillCategory.Offense:
-                Debug.Log("b");
-                general.skillIndex = index;
-                general.actionType = actionType;
+                //Debug.Log("b");
+                enemySelector.skillIndex = index;
+                enemySelector.actionType = actionType;
                 enemySelector.StartEnemySelection();
                 break;
             case Skill.SkillCategory.Buff: break;
         }
     }
+
+
+    /*public IEnumerator RollManual(int minRoll, int maxRoll)
+    {
+        diceHolder.SetActive(true);
+        diceHolder.GetComponentInChildren<Button>().interactable = true;
+        diceHolder.transform.GetChild(0).GetChild(0).gameObject.SetActive(true);
+        diceHolder.transform.GetChild(0).GetChild(1).gameObject.SetActive(true);
+
+        diceStopFlag = false;
+
+        // Initialize queue
+        rollQueue[1] = Random.Range(minRoll, maxRoll + 1); // current
+        rollQueue[0] = Random.Range(minRoll, maxRoll + 1); // upcoming
+        rollQueue[2] = Random.Range(minRoll, maxRoll + 1); // optional buffer
+
+        while (!diceStopFlag)
+        {
+            // Shift queue forward
+            rollQueue[2] = rollQueue[1];
+            rollQueue[1] = rollQueue[0];
+            rollQueue[0] = Random.Range(minRoll, maxRoll + 1);
+            currentRoll = rollQueue[1];
+
+            // Display current roll
+            diceHolder.GetComponentInChildren<TextMeshProUGUI>().text = rollQueue[1].ToString();
+            diceHolder.transform.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>().text = rollQueue[0].ToString();
+            diceHolder.transform.GetChild(0).GetChild(1).GetComponent<TextMeshProUGUI>().text = rollQueue[2].ToString();
+
+            yield return new WaitForSeconds(0.3f);
+        }
+    }*/
 
     public IEnumerator RollManual(int minRoll, int maxRoll)
     {
@@ -172,10 +204,18 @@ public class BattleManager : MonoBehaviour
 
         while (!diceStopFlag)
         {
-            currentRoll = Random.Range(minRoll, maxRoll + 1); // inclusive
+            if (currentRoll < maxRoll)
+            {
+                currentRoll += 1;
+            }
+            else
+            {
+                currentRoll = minRoll;
+            }
+
             diceHolder.GetComponentInChildren<TextMeshProUGUI>().text = currentRoll.ToString();
 
-            yield return new WaitForSeconds(0.03f);
+            yield return new WaitForSeconds(0.01f);
         }
     }
 
@@ -183,6 +223,8 @@ public class BattleManager : MonoBehaviour
     {
         diceHolder.SetActive(true);
         diceHolder.GetComponentInChildren<Button>().interactable = false;
+        //diceHolder.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
+        //diceHolder.transform.GetChild(0).GetChild(1).gameObject.SetActive(false);
 
         float timer = 0f;
         float duration = 0.5f;
@@ -207,6 +249,8 @@ public class BattleManager : MonoBehaviour
     {
         diceHolder.SetActive(true);
         diceHolder.GetComponentInChildren<Button>().interactable = false;
+        //diceHolder.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
+        //diceHolder.transform.GetChild(0).GetChild(1).gameObject.SetActive(false);
 
         float timer = 0f;
         float duration = 0.2f;

@@ -6,7 +6,6 @@ public class SkillHolder : MonoBehaviour
     public int skillIndex;
     public Skill heldSkill;
     public ActionType actionType;
-    [SerializeField] EnemySelectorGeneral general;
     [SerializeField] private BattleManager battleManager;
 
     public void SendActionSignal()
