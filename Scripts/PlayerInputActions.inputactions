@@ -177,7 +177,7 @@
                 {
                     "name": "",
                     "id": "f6bcc696-420a-46e7-8781-507d4d9ccd7e",
-                    "path": "<Mouse>/press",
+                    "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -299,17 +299,6 @@
                     "name": "",
                     "id": "97584859-c74a-4f4f-acc6-af8fef0f8fdc",
                     "path": "<Keyboard>/e",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Submit",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "b3e9e9a7-6677-4581-8c61-49aa4e5720ba",
-                    "path": "<Mouse>/leftButton",
                     "interactions": "",
                     "processors": "",
                     "groups": "",

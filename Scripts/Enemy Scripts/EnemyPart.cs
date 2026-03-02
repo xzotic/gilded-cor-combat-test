@@ -8,4 +8,5 @@ public class EnemyPart : MonoBehaviour
     public int partCurrentHP;
 
     public EnemySkill[] enemySkills;
+    public EnemySkill selectedSkill;
 }

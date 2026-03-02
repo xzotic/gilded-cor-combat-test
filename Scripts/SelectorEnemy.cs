@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.UIElements;
 
 public class SelectorEnemy : MonoBehaviour
 {
@@ -10,6 +11,7 @@ public class SelectorEnemy : MonoBehaviour
     private InputAction action;
     private InputAction action_press;
     private InputAction action_release;
+    private InputAction action_mouse;
 
     [HideInInspector] public int skillIndex; public ActionType actionType;
     [SerializeField] private TurnManager turnManager;
@@ -19,6 +21,9 @@ public class SelectorEnemy : MonoBehaviour
     public GameObject enemyHolder;
     public List<Enemy> activeEnemies = new List<Enemy>();
     public GameObject currentSelection;
+
+    //public int currentSelectionIndex;
+    //public int maxSelectionIndex;
 
     public Enemy enemy;
     public EnemyPart part;
@@ -37,6 +42,7 @@ public class SelectorEnemy : MonoBehaviour
         action = actionMap.FindAction("Navigation");
         action_press = actionMap.FindAction("Submit");
         action_release = actionMap.FindAction("Cancel");
+        action_mouse = actionMap.FindAction("Press");
         selectionStage = SelectionStage.None;
 
         actionMap.Disable();
@@ -52,13 +58,6 @@ public class SelectorEnemy : MonoBehaviour
         menuNav.DisableMainLayer();
         actionMap.Enable();
 
-        GetComponent<SpriteRenderer>().color = Color.red;
-        currentSelection = GameObject.FindWithTag("Enemy");
-        transform.position = currentSelection.transform.position;
-
-
-        action.performed += OnNavigate;
-
 
         foreach (Transform child in enemyHolder.transform)
         {
@@ -73,6 +72,13 @@ public class SelectorEnemy : MonoBehaviour
             }
         }
 
+        GetComponent<SpriteRenderer>().color = Color.red;
+        //currentSelection = activeEnemies[0].gameObject;
+        //currentSelectionIndex = 0; maxSelectionIndex = activeEnemies.Count-1;
+        transform.position = currentSelection.transform.position;
+
+
+        action.performed += OnNavigate;
         action_press.performed += FinishEnemySelection;
         action_release.performed += CancelEnemySelection;
     }
@@ -138,6 +144,7 @@ public class SelectorEnemy : MonoBehaviour
         EnterToActionQueue();
 
         GetComponent<SpriteRenderer>().color = Color.clear;
+        activeEnemies.Clear();
         selectionStage = SelectionStage.None;
         currentSelection = null;
         enemy = null;
@@ -252,11 +259,28 @@ public class SelectorEnemy : MonoBehaviour
         }
     }
 
+    private void OnNavigate(InputAction.CallbackContext ctx) 
+    { 
+        Vector2 input = ctx.ReadValue<Vector2>(); 
+        if (Mathf.Abs(input.x) > 0.5f) MoveSelection(input.x > 0 ? Vector2.right : Vector2.left); 
+    } 
+
+    /*public void MoveSelection(int direction)
+    {
+        if (activeEnemies.Count == 0)
+            return;
+
+        currentSelectionIndex =
+            (currentSelectionIndex + direction + activeEnemies.Count)
+            % activeEnemies.Count;
+
+        currentSelection = activeEnemies[currentSelectionIndex].gameObject;
+        transform.position = currentSelection.transform.position;
+    }
+
     private void OnNavigate(InputAction.CallbackContext ctx)
     {
         Vector2 input = ctx.ReadValue<Vector2>();
-
-        if (Mathf.Abs(input.x) > 0.5f)
-            MoveSelection(input.x > 0 ? Vector2.right : Vector2.left);
-    }
+        if (Mathf.Abs(input.x) > 0.5f) MoveSelection(input.x > 0 ? 1 : -1);
+    } */
 }
